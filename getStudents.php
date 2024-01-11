@@ -1,24 +1,13 @@
 <?php
 
-use Alura\Pdo\Domain\Model\Student;
+use Alura\Pdo\Infra\Persistence\ConnectionCreator;
+use Alura\Pdo\Infra\Repository\PdoStudentRepository;
 
 require_once 'vendor/autoload.php';
 
-$databasePath = __DIR__.'/database.sqlite';
-$pdo = new PDO("sqlite:$databasePath");
+$connection = ConnectionCreator::createConnection();
 
-$sqlGet = "SELECT * FROM students";
-
-$statement = $pdo->query($sqlGet);
-$studentsDataList = $statement->fetchAll(PDO::FETCH_ASSOC);
-$students = [];
-
-foreach ($studentsDataList as $studentData) {
-    $students[] = new Student(
-        $studentData['id'], 
-        $studentData['name'], 
-        new DateTimeImmutable($studentData['birth_date'])
-    );
-}
+$repository = new PdoStudentRepository($connection);
+$students = $repository->allStudents();
 
 var_dump($students);
